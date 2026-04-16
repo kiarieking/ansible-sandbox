@@ -22,15 +22,40 @@
     - name: Remove old chrome deb file
       ansible.builtin.file: path=/home/kkiarie/google-chrome-stable_current_amd64.deb state=absent
 
-    - name: Download Chrome.deb file to install
-      ansible.builtin.get_url:
-        url: https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb 
-        dest: /home/kkiarie 
+    - name: Add google-chrome repositories
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main"
+        state: present
 
-    - name: Install Chrome
+    - name: Install google-chrome
       ansible.builtin.apt:
-        deb: /home/kkiarie/google-chrome-stable_current_amd64.deb
+        name: google-chrome-stable
+        state: present
+        update_cache: yes
       become: true
 
     - name: Ensure Chrome is Installed
-      apt: name=google-chrome state=present
+      apt: name=google-chrome-stable state=present
+
+    - name: Download chromedriver
+      ansible.builtin.get_url:
+        url: https://storage.googleapis.com/chrome-for-testing-public/146.0.7680.165/linux64/chromedriver-linux64.zip
+        dest: /home/kkiarie/chromedriver.zip
+        force: no
+
+    - name: Delete old chromedriver zip file
+      ansible.builtin.file: path=/home/kkiarie/chromedriver-linux64.zip state=absent 
+
+    - name: Unzip chromedriver zip
+      ansible.builtin.unarchive:
+        src: /home/kkiarie/chromedriver.zip
+        dest: /home/kkiarie
+
+    - name: Move chromedriver to /usr/bin
+      ansible.builtin.command: mv /home/kkiarie/chromedriver-linux64/chromedriver /usr/bin
+      become: true
+
+    - name: Confirm chromedriver has been updated
+      ansible.builtin.command: chromedriver --version
+
+
