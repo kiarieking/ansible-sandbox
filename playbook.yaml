@@ -50,6 +50,8 @@
       ansible.builtin.unarchive:
         src: /home/kkiarie/chromedriver.zip
         dest: /home/kkiarie
+        remote_src: yes
+        creates: /home/kkiarie/chromedriver-linux64
 
     - name: Move chromedriver to /usr/bin
       ansible.builtin.command: mv /home/kkiarie/chromedriver-linux64/chromedriver /usr/bin
